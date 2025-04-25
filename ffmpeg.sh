@@ -49,17 +49,19 @@ fi
 filename=$(basename -- "$input_file")
 name="${filename%.*}"
 ext="${filename##*.}"
+ext_lower=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
 
-# ✅ Confirm it's a .MOV file (case-insensitive)
-if [[ "$(echo "$ext" | tr '[:upper:]' '[:lower:]')" != "mov" ]]; then
-    echo "❌ Error: Input file must have a .MOV extension."
+# ✅ Supported formats (excluding .avi)
+valid_exts=("mov" "mp4" "mkv")
+if [[ ! " ${valid_exts[*]} " =~ " $ext_lower " ]]; then
+    echo "❌ Error: Unsupported file extension '$ext'. Supported: ${valid_exts[*]}"
     exit 1
 fi
 
-# ✅ Set output paths
+# ✅ Set output paths (always using _compressed)
 input_dir=$(dirname "$input_file")
-output_mp4="${input_dir}/${name}_ffmpeg-raw.mp4"
-final_mp4="${input_dir}/${name}.mp4"
+output_mp4="${input_dir}/${name}_compressed_ffmpeg-raw.mp4"
+final_mp4="${input_dir}/${name}_compressed.mp4"
 
 # ⚠️ Check for existing files
 if [[ -f "$output_mp4" || -f "$final_mp4" ]]; then
@@ -112,7 +114,7 @@ else
 fi
 
 # 🕒 Sync timestamps using SetFile (macOS only)
-echo "🕒 Syncing timestamps from original .MOV to output files..."
+echo "🕒 Syncing timestamps from original file to output files..."
 CREATION_TIME=$(GetFileInfo -d "$input_file")
 MODIFICATION_TIME=$(GetFileInfo -m "$input_file")
 
