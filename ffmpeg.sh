@@ -51,14 +51,22 @@ name="${filename%.*}"
 ext="${filename##*.}"
 ext_lower=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
 
-# ✅ Supported formats (excluding .avi)
+# ✅ Supported formats (no .avi)
 valid_exts=("mov" "mp4" "mkv")
-if [[ ! " ${valid_exts[*]} " =~ " $ext_lower " ]]; then
+is_valid=false
+for valid in "${valid_exts[@]}"; do
+    if [[ "$ext_lower" == "$valid" ]]; then
+        is_valid=true
+        break
+    fi
+done
+
+if [[ "$is_valid" != true ]]; then
     echo "❌ Error: Unsupported file extension '$ext'. Supported: ${valid_exts[*]}"
     exit 1
 fi
 
-# ✅ Set output paths (always using _compressed)
+# ✅ Set output paths with _compressed
 input_dir=$(dirname "$input_file")
 output_mp4="${input_dir}/${name}_compressed_ffmpeg-raw.mp4"
 final_mp4="${input_dir}/${name}_compressed.mp4"
