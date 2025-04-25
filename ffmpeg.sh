@@ -69,9 +69,15 @@ process_file() {
         return
     fi
 
-    # ✅ Set output paths with _compressed
+    # ✅ Set input directory (where the input file is located)
     input_dir=$(dirname "$input_file")
-    output_mp4="${input_dir}/${name}_compressed_ffmpeg-raw.mp4"
+
+    # ✅ Create directory for raw ffmpeg outputs if it doesn't exist
+    raw_dir="${input_dir}/ffmpeg_raw"
+    mkdir -p "$raw_dir"
+
+    # ✅ Set output paths with _compressed in the main directory, _ffmpeg-raw in the new directory
+    output_mp4="${raw_dir}/${name}_compressed_ffmpeg-raw.mp4"
     final_mp4="${input_dir}/${name}_compressed.mp4"
 
     # ⚠️ Check for existing files
